@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: member-counter
+    runtime: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python member_stream.py"
+    envVars:
+      - key: PORT
+        value: 8088
+      - key: CUTOFF_DATE
+        value: 2026-04-01
+      - key: LAUNCH_ISO
+        value: 2026-05-01T00:00:00+02:00
+      - key: FORCE_LIVE
+        value: "1"
+      - key: ITARGET_POLL_SECONDS
+        value: "10"
+      - key: REMINDERS_PATH
+        value: /opt/render/project/src/reminders.csv
