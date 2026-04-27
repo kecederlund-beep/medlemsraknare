@@ -104,3 +104,20 @@ rekord.dindomän.se
 - `/debug` saknar `last_error`.
 - `/banner` ser bra ut i mobil.
 - Cloudflare SSL står på **Full** eller **Full (strict)**.
+
+
+## Manual count update
+
+For the stable manual option, remove all ITARGET_* environment variables on Render.
+
+Add:
+UPLOAD_TOKEN=<choose-a-secret-token>
+FORCE_LIVE=1
+
+Then update the displayed count with:
+
+curl -X POST https://medlemsraknare.onrender.com/upload \
+  -H "Content-Type: application/json" \
+  -H "x-upload-token: <UPLOAD_TOKEN>" \
+  -d '{"count": 11796}'
+

@@ -55,6 +55,7 @@ ITARGET_INTERNAL_HEADERS = os.getenv("ITARGET_INTERNAL_HEADERS", "").strip()
 ITARGET_INTERNAL_BODY = os.getenv("ITARGET_INTERNAL_BODY", "").strip()
 ITARGET_INTERNAL_EXPECTED_STATUS = os.getenv("ITARGET_INTERNAL_EXPECTED_STATUS", "active").strip().lower()
 FORCE_LIVE = os.getenv("FORCE_LIVE", "0") == "1"
+UPLOAD_TOKEN = os.getenv("UPLOAD_TOKEN", "").strip()
 INTERNAL_COUNT_MODE = bool(ITARGET_INTERNAL_ENDPOINT)
 API_COUNT_MODE = INTERNAL_COUNT_MODE or bool(ITARGET_TOKEN and ITARGET_CLIENT_ID)
 
@@ -2022,18 +2023,49 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if self.path.startswith("/upload"):
+            if UPLOAD_TOKEN:
+                provided = self.headers.get("x-upload-token", "").strip()
+                auth = self.headers.get("authorization", "").strip()
+                bearer = auth[7:].strip() if auth.lower().startswith("bearer ") else ""
+                if provided != UPLOAD_TOKEN and bearer != UPLOAD_TOKEN:
+                    body = json.dumps({"ok": False, "error": "unauthorized"}).encode("utf-8")
+                    self.send_response(401)
+                    self.send_header("Content-Type", "application/json; charset=utf-8")
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+
             length = int(self.headers.get("Content-Length", "0"))
             raw = self.rfile.read(length)
-            text = raw.decode("utf-8-sig", errors="replace")
+            content_type = self.headers.get("Content-Type", "").lower()
+            info = {}
 
-            cutoff = datetime.strptime(CUTOFF_DATE, "%Y-%m-%d")
-            count, info = count_from_csv_text(text, cutoff)
+            if "application/json" in content_type:
+                try:
+                    data = json.loads(raw.decode("utf-8"))
+                    count = int(data.get("count"))
+                    if count < 0:
+                        raise ValueError("count must be non-negative")
+                    info = {"source": "manual-json", "raw": data}
+                except Exception as e:
+                    body = json.dumps({"ok": False, "error": f"invalid json count: {e}"}).encode("utf-8")
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json; charset=utf-8")
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+            else:
+                text = raw.decode("utf-8-sig", errors="replace")
+                cutoff = datetime.strptime(CUTOFF_DATE, "%Y-%m-%d")
+                count, info = count_from_csv_text(text, cutoff)
+
             state["count"] = count
             state["updated_at"] = datetime.now().isoformat(timespec="seconds")
             state["last_error"] = None
             state["last_upload"] = info
 
             payload = {
+                "ok": True,
                 "count": state["count"],
                 "updatedAt": state["updated_at"],
                 "info": info,
