@@ -629,7 +629,7 @@ PAGE_HTML = """<!doctype html>
       color: var(--fg);
       -webkit-text-size-adjust: 100%;
       background:
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat fixed;
       position: relative;
     }
@@ -645,7 +645,7 @@ PAGE_HTML = """<!doctype html>
     @media (max-aspect-ratio: 9/16) {
       body {
         background-image:
-          url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874547/9x16_il2fgk.png");
+          url("https://images.markethype.io/69abc93d-ba01-46cf-a4d7-864975afbbe2.png");
       }
     }
 
@@ -870,7 +870,7 @@ PAGE_HTML = """<!doctype html>
       overflow: hidden;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat;
       border: 1px solid rgba(255,255,255,0.18);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 16px 40px rgba(0,0,0,0.35);
@@ -1175,14 +1175,14 @@ PRE_PAGE_HTML = """<!doctype html>
       -webkit-text-size-adjust: 100%;
       font-synthesis: weight;
       background:
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat fixed;
       min-height: 100vh;
     }
     @media (max-aspect-ratio: 9/16) {
       body {
         background-image:
-          url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874547/9x16_il2fgk.png");
+          url("https://images.markethype.io/69abc93d-ba01-46cf-a4d7-864975afbbe2.png");
       }
     }
     .page {
@@ -1477,7 +1477,7 @@ STRIP_HTML = """<!doctype html>
       -webkit-text-size-adjust: 100%;
       background:
         linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat;
       background-repeat: no-repeat, no-repeat;
       background-size: cover, cover;
@@ -1674,7 +1674,7 @@ PRE_STRIP_HTML = """<!doctype html>
       -webkit-text-size-adjust: 100%;
       background:
         linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat;
       background-repeat: no-repeat, no-repeat;
       background-size: cover, cover;
@@ -1809,14 +1809,14 @@ UPLOAD_HTML = """<!doctype html>
       min-height: 100vh;
       color: #f5f7fb;
       background:
-        url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874210/Ro%CC%88d_bakgrund_16x9_zmjth9.png")
+        url("https://images.markethype.io/dbf20cd3-e529-47e5-a643-47c8c201c7ab.png")
         center / cover no-repeat;
     }
 
     @media (max-aspect-ratio: 9/16) {
       body {
         background-image:
-          url("https://res.cloudinary.com/dufekxhkq/image/upload/v1758874547/9x16_il2fgk.png");
+          url("https://images.markethype.io/69abc93d-ba01-46cf-a4d7-864975afbbe2.png");
       }
     }
 
@@ -1884,7 +1884,7 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
         query = parse_qs(parsed.query)
         query_force_live = query.get("live", ["0"])[0] == "1"
-        live_mode = FORCE_LIVE or query_force_live or is_launch_live()
+        live_mode = True  # Always show the live member counter. No countdown/pre-launch mode.
 
         if path == "/" or path.startswith("/page"):
             self.send_response(200)
@@ -1972,7 +1972,7 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if path.startswith("/status"):
-            payload = {"live": live_mode}
+            payload = {"live": True}
             body = json.dumps(payload).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
